@@ -2,7 +2,8 @@
 
 
 
-class Link:
+
+class Edge:
     def __init__(self, ver_a, ver_b, p):
         self.ver_a = ver_a
         self.ver_b = ver_b
@@ -14,17 +15,17 @@ class Link:
         return b
 
     def __repr__(self):
-        return 'Link('+str(self.ver_a) + str(self.ver_b)+' weight= ' + str(self.p)+')'
+        return 'edge('+str(self.ver_a) + str(self.ver_b)+' weight= ' + str(self.p)+')'
 
 
 class Vertex:
    def __init__(self,num):
        self.pai = 0
        self.num =num
-       self.list_link= list()
+       self.list_edge= list()
 
-   def add_link(self,l:Link):
-       self.list_link.append(l)
+   def add_edge(self, l:Edge):
+       self.list_edge.append(l)
    def color (self,pai):
        pass
 
@@ -37,15 +38,18 @@ class Vertex:
 
 
    def print(self):
-       for l in self.list_link:
+       for l in self.list_edge:
            print(l)
+
+class Cycles:
+    pass
 
 class Graph:
     def __init__(self):
         self.verticals =list()
-        self.links = list()
+        self.edges = list()
     def is_exist(self,l):
-        for i in self.links:
+        for i in self.edges:
             if l==i:
                 return True
         return False
@@ -69,30 +73,44 @@ class Graph:
                     v.append(int(s))
             ver_a = self.get(v[0])
             ver_b = self.get(v[1])
-            L=Link(ver_a,ver_b,v[2])
+            L=Edge(ver_a, ver_b, v[2])
             if not self.is_exist(L):
-                ver_a.list_link.append(L)
-                ver_b.list_link.append(L)
-                self.links.append(L)
+                ver_a.list_edge.append(L)
+                ver_b.list_edge.append(L)
+                self.edges.append(L)
     def print(self):
         for p in self.verticals:
             print(p)
             p.print()
+    def get_ostav(self):
+        return self
 
+    def get_diff_edges(self,graph):
+        pass
+
+    def get_cycle_list(self,edge_list):
+        pass
+
+def print_cycles(c):
+    pass
 
 def main():
     # Поиск фундаментальных циклов графа.
     # Загружаем граф. - g_main
-    g = Graph()
-    g.load_file('data/test_1.txt')
-    # Находим оставное дерево графа G_ostav
+    g_main = Graph()
+    g_main.load_file('data/test_1.txt')
+    # Находим оставное дерево графа g_ostav
+    g_ostav = g_main.get_ostav()
     # Находим разницу множеств ребер из G_main и G_ostav
     # это ребра образующие основные циклы.
-    # нахоидм цепи по каждому из ребер
+    edge_list = g_main.get_diff_edges(g_ostav)
+    # нахоидм цепи (циклы) по каждому из ребер
+    cycle_list =  g_main.get_cycle_list(edge_list)
+
     # Выводим каждую из найденных цепей
+    print_cycles(cycle_list)
     # Выводим G_ostav
-    g.print()
-    pass
+    g_ostav.print()
 
 
 
