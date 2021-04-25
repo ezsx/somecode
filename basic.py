@@ -103,4 +103,7 @@ def main():
     g.load_file('C:/python_graphs/test_1.txt')
     g.print()
 
+def test():
+     pass
+
 main()
