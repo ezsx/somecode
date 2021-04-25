@@ -80,30 +80,20 @@ class Graph:
             p.print()
 
 
-class Сycle_basis:
-    def __init__(self, ver_a, ver_b, p):
-        self.ver_a = ver_a
-        self.ver_b = ver_b
-        self.p = p
-
-    def DFS(self,p):
-        p.pai= 1
-        for c in p.verticals:
-
-
-    def obxod(self,g=Graph()):
-       for p in g.verticals:
-          if p.pai == 0:
-              DFS()
-
-
-
 def main():
+    # Поиск фундаментальных циклов графа.
+    # Загружаем граф. - g_main
     g = Graph()
-    g.load_file('C:/python_graphs/test_1.txt')
+    g.load_file('data/test_1.txt')
+    # Находим оставное дерево графа G_ostav
+    # Находим разницу множеств ребер из G_main и G_ostav
+    # это ребра образующие основные циклы.
+    # нахоидм цепи по каждому из ребер
+    # Выводим каждую из найденных цепей
+    # Выводим G_ostav
     g.print()
+    pass
 
-def test():
-     pass
+
 
 main()
