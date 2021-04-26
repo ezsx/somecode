@@ -48,6 +48,7 @@ class Graph:
     def __init__(self):
         self.verticals =list()
         self.edges = list()
+
     def is_exist(self,l):
         for i in self.edges:
             if l==i:
@@ -82,8 +83,25 @@ class Graph:
         for p in self.verticals:
             print(p)
             p.print()
+
+    def add_edge(self,e:Edge):
+        pass
+
     def get_ostav(self):
-        return self
+        vGraph_r = Graph()
+        # Копируем список ребер исходного графа
+        list0 = list(self.edges)
+        list_deffer = list()
+        # Перебираем исходный список, пока не закончатся ребра
+        while(len(list0) > 0):
+            # Перебор ребер исходного графа
+                # добавляем ребро в новый граф
+                # 1 - добавил, -1 не требует добавления, 0 - рано добавлять
+                # если рано добавлять, сохраняем в отложенном списке.
+           # перенести список отложенных в исходный
+            list0 = list_deffer
+            list_deffer = list()
+        return vGraph_r
 
     def get_diff_edges(self,graph):
         pass
