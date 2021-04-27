@@ -80,12 +80,47 @@ class Graph:
                 ver_b.list_edge.append(L)
                 self.edges.append(L)
     def print(self):
-        for p in self.verticals:
+        #for p in self.verticals:
+        #    print(p)
+        #    p.print()
+        for p in self.edges:
             print(p)
-            p.print()
 
-    def add_edge(self,e:Edge):
-        pass
+
+    def add_edge(self, e: Edge):
+
+        v_num = None
+        v_r2 = None
+        c = 0
+
+        if len(self.verticals) == 0:
+            v1 = Vertex(e.ver_a.num)
+            v2 = Vertex(e.ver_b.num)
+            self.verticals.append(v1)
+            self.verticals.append(v2)
+            ed = Edge(v1, v2, e.p)
+            self.edges.append(ed)
+            return 1
+        for v in self.verticals:
+            if v.num == e.ver_a.num:
+                c += 1
+                v_num = e.ver_b.num
+                v_r2 = e.ver_a
+            if v.num == e.ver_b.num:
+                c += 1
+                v_num = e.ver_a.num
+                v_r2 = e.ver_b
+
+        if c == 2:
+            return -1
+        if c == 1:
+            ver = Vertex(v_num)
+            ed = Edge(ver, v_r2, e.p)
+            self.edges.append(ed)
+            self.verticals.append(ver)
+            return 1
+        if c == 0:
+            return 0
 
     def get_ostav(self):
         vGraph_r = Graph()
@@ -93,20 +128,25 @@ class Graph:
         list0 = list(self.edges)
         list_deffer = list()
         # Перебираем исходный список, пока не закончатся ребра
-        while(len(list0) > 0):
-            # Перебор ребер исходного графа
+        while len(list0) > 0:
+            # Перебор копии ребер исходного графа
+            for e in list0:
                 # добавляем ребро в новый граф
+                res = vGraph_r.add_edge(e)
                 # 1 - добавил, -1 не требует добавления, 0 - рано добавлять
                 # если рано добавлять, сохраняем в отложенном списке.
-           # перенести список отложенных в исходный
+                if res == 0:
+                    list_deffer.append(e)
+
+            # перенести список отложенных в исходный
             list0 = list_deffer
             list_deffer = list()
         return vGraph_r
 
-    def get_diff_edges(self,graph):
+    def get_diff_edges(self, graph):
         pass
 
-    def get_cycle_list(self,edge_list):
+    def get_cycle_list(self, edge_list):
         pass
 
 def print_cycles(c):
@@ -129,7 +169,5 @@ def main():
     print_cycles(cycle_list)
     # Выводим G_ostav
     g_ostav.print()
-
-
 
 main()
