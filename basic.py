@@ -1,30 +1,33 @@
 
-
-
-
+from collections import Counter
+from _bisect import bisect_left
 
 class Edge:
     def __init__(self, ver_a, ver_b, p):
         self.ver_a = ver_a
         self.ver_b = ver_b
-        self.p     = p
+        self.p = p
 
     def __eq__(self, other):
-        b =(self.ver_a==other.ver_a and self.ver_b == other.ver_b) or \
-        (self.ver_a == other.ver_b and self.ver_b == other.ver_a)
+        b = (self.ver_a.num == other.ver_a.num and self.ver_b.num == other.ver_b.num) or \
+         (self.ver_a.num == other.ver_b.num and self.ver_b.num == other.ver_a.num)
         return b
 
     def __repr__(self):
         return 'edge('+str(self.ver_a) + str(self.ver_b)+' weight= ' + str(self.p)+')'
 
+    def __hash__(self):
+        v_min = min(self.ver_a.num, self.ver_b.num)
+        v_max = max(self.ver_a.num, self.ver_b.num)
+        return hash(str(v_min) + str(v_max) + str(self.p))
 
 class Vertex:
-   def __init__(self,num):
+   def __init__(self, num):
        self.pai = 0
        self.num =num
        self.list_edge= list()
 
-   def add_edge(self, l:Edge):
+   def add_edge(self, l: Edge):
        self.list_edge.append(l)
    def color (self,pai):
        pass
@@ -145,10 +148,31 @@ class Graph:
         return vGraph_r
 
     def get_diff_edges(self, graph):
-        pass
+        list0 = list(self.edges)
+        list1 = list(graph.edges)
+        set0 = set(list0)
+        set1 = set(list1)
+        # хэшировать списки самостоятельно
+        set2 = set0-set1
+        print("___________------___________", set0)
+        print("___________------___________", set1)
+        print("___________------___________", set2)
+        return set2
+
+
 
     def get_cycle_list(self, edge_list):
+        # берем ребро из списка ребер
+        # берем две вершины из ребра
+        # для этих вершин ищим общую 3 вершину инцедентную им обоим
+        # образуем цикл из 3 вершин
+        # добавляем в список получившийся цикл
         pass
+
+
+def contains(sorted_seq, item):
+    i = bisect_left(sorted_seq, item)
+    return i != len(sorted_seq) and sorted_seq[i] == item
 
 def print_cycles(c):
     pass
@@ -170,5 +194,8 @@ def main():
     print_cycles(cycle_list)
     # Выводим G_ostav
     g_ostav.print()
+    print("_________")
+    for p in edge_list:
+        print(p)
 
 main()
