@@ -25,7 +25,7 @@ class Vertex:
    def __init__(self, num):
        self.pai = 0
        self.num =num
-       self.list_edge= list()
+       self.list_edge = list()
 
    def add_edge(self, l: Edge):
        self.list_edge.append(l)
@@ -38,17 +38,34 @@ class Vertex:
    def __str__(self):
        return self.__repr__()
 
-   def get_path_to(self,v_calling:Vertex,v_looking:Vertex, l:list):
-        # Проверить среди своих соседей, есть ли вершина v
-            # Цикл по соседям
-                # если есть, то добавить в список l, себя, найденную вершину и вернуть значение 1
+   def get_path_to(self, v_calling, v_looking, l: list):
+        # сформировать список соседей вершин
+        list_vertex = [e.ver_a if e.ver_a != self else e.ver_b for e in self.list_edge]
+        # Проверить среди своих соседей, есть ли вершина v_looking
+        # Цикл по соседям
+        for v in list_vertex:
+            # если есть, то добавить в список l, себя, найденную вершину и вернуть значение 1
+            if v == v_looking:
+                l.append(v_looking)
+                l.append(self)
+                return 1
+
         # Продолжаем если не нашли
-           # Цикл по соседям
-                # вызвать get_path_to для каждого из соседа, кроме вызывающего
-                # если 0, то продолжаем
-                # если 1, то  добавляем себя в список и возвращаем 1.
-       #возвращаем 0
-        pass
+        # Цикл по соседям
+        for v in list_vertex:
+            # вызвать get_path_to для каждого из соседа, кроме вызывающего
+            if v == v_calling:
+                continue
+            a = v.get_path_to(v_calling=self, v_looking=v_looking, l=l)
+            # если 0, то продолжаем
+            # если 1, то  добавляем себя в список и возвращаем 1.
+            if a == 1:
+                l.append(self)
+                return 1
+
+        # возвращаем 0
+        return 0
+
 
    def print(self):
        for l in self.list_edge:
@@ -68,15 +85,17 @@ class Graph:
                 return True
         return False
 
-    def get(self,num_A):
+    def get(self, num_A, is_create=True):
         for v in self.verticals:
             if v.num == num_A:
                 return v
-        v_new = Vertex(num_A)
-        self.verticals.append(v_new)
-        return v_new
-
-    def load_file(self,file):
+        if is_create:
+            v_new = Vertex(num_A)
+            self.verticals.append(v_new)
+            return v_new
+        else:
+            return None
+    def load_file(self, file):
         f = open(file)
 
         for line in f:
@@ -92,6 +111,7 @@ class Graph:
                 ver_a.list_edge.append(L)
                 ver_b.list_edge.append(L)
                 self.edges.append(L)
+
     def print(self):
         #for p in self.verticals:
         #    print(p)
@@ -99,42 +119,21 @@ class Graph:
         for p in self.edges:
             print(p)
 
-
-
     def add_edge(self, e: Edge):
-
-        v_num = None
-        v_r2 = None
-        c = 0
-
-        if len(self.verticals) == 0:
-            v1 = Vertex(e.ver_a.num)
-            v2 = Vertex(e.ver_b.num)
-            self.verticals.append(v1)
-            self.verticals.append(v2)
-            ed = Edge(v1, v2, e.p)
-            self.edges.append(ed)
-            return 1
-        for v in self.verticals:
-            if v.num == e.ver_a.num:
-                c += 1
-                v_num = e.ver_b.num
-                v_r2 = e.ver_a
-            if v.num == e.ver_b.num:
-                c += 1
-                v_num = e.ver_a.num
-                v_r2 = e.ver_b
-
-        if c == 2:
-            return -1
-        if c == 1:
-            ver = Vertex(v_num)
-            ed = Edge(ver, v_r2, e.p)
-            self.edges.append(ed)
-            self.verticals.append(ver)
-            return 1
-        if c == 0:
+        # найти вершину а и найти вершину б
+        ver0 = self.get(e.ver_a.num, False)
+        ver1 = self.get(e.ver_b.num, False)
+        # если вершины в графе нет то вернуть 0
+        if ver0 == ver1 and len(self.verticals)!=0: # если оба None
             return 0
+        if (ver0 != None) and (ver1 != None):
+            return -1
+        # берем вершину а и вершину б создаем эдж
+        ver0 = self.get(e.ver_a.num)
+        ver1 = self.get(e.ver_b.num)
+        # добавляем эдж в граф
+        self.edges.append(Edge(ver0, ver1, e.p))
+        return 1
 
     def get_ostav(self):
         vGraph_r = Graph()
@@ -155,6 +154,9 @@ class Graph:
             # перенести список отложенных в исходный
             list0 = list_deffer
             list_deffer = list()
+        for e in vGraph_r.edges:
+            e.ver_a.add_edge(e)
+            e.ver_b.add_edge(e)
         return vGraph_r
 
     def get_diff_edges(self, graph):
@@ -164,25 +166,28 @@ class Graph:
         set1 = set(list1)
         # хэшировать списки самостоятельно
         set2 = set0-set1
-        print("___________------___________", set0)
-        print("___________------___________", set1)
         print("___________------___________", set2)
         return set2
 
-
-
     def get_cycle_list(self, edge_list):
         ### создаем и наполняем список cycle_list_r
-        #### в цикле по поученным ребрам
+        cycle_list_r = list()
+        #### в цикле по полученным ребрам
+        for e in edge_list:
             # берем ребро из списка ребер
             # создаем список под вершины цикла lv
+            lv = list()
             # берем одну вершину и спрашииваем у нее путь до второй из ребра, передавая lv
+            ver0 = self.get(e.ver_a.num)
+            ver1 = self.get(e.ver_b.num)
+            ver0.get_path_to(ver0, ver1, lv)
             # получаем список lv и добавляем его в cycle_list_r
-        pass
+            cycle_list_r.append(lv)
+        return cycle_list_r
 
-def print_cycles(c):
-    pass
-
+def print_cycles(cycle_list_r):
+    for c in cycle_list_r:
+        print(c)
 def main():
     # Поиск фундаментальных циклов графа.
     # Загружаем граф. - g_main
@@ -194,10 +199,12 @@ def main():
     # это ребра образующие основные циклы.
     edge_list = g_main.get_diff_edges(g_ostav)
     # нахоидм цепи (циклы) по каждому из ребер
-    cycle_list =  g_main.get_cycle_list(edge_list)
+    cycle_list =g_ostav.get_cycle_list(edge_list)
 
     # Выводим каждую из найденных цепей
+    print("_________*")
     print_cycles(cycle_list)
+    print("_________*")
     # Выводим G_ostav
     g_ostav.print()
     print("_________")
